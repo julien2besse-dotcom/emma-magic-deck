@@ -242,8 +242,14 @@ const CARDS = [
     }
 ];
 
+// ─── Test Mode ────────────────────────────────────────
+// Add ?test to URL for unlimited draws (no daily limit)
+const TEST_MODE = window.location.search.includes('test');
+
 // ─── State ────────────────────────────────────────────
 const STORAGE_KEY = 'emma_magic_deck';
+const IDB_NAME = 'emma_deck_db';
+const IDB_STORE = 'state';
 
 function getDefaultState() {
     return {
@@ -257,7 +263,13 @@ function getDefaultState() {
 let state = getDefaultState();
 
 function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const data = JSON.stringify(state);
+    // Primary: localStorage
+    try { localStorage.setItem(STORAGE_KEY, data); } catch {}
+    // Backup: IndexedDB
+    saveToIDB(data);
+    // Show save indicator briefly
+    showSaveIndicator();
 }
 
 function loadState() {
@@ -265,10 +277,76 @@ function loadState() {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
             state = { ...getDefaultState(), ...JSON.parse(raw) };
+            return;
         }
-    } catch {
-        state = getDefaultState();
-    }
+    } catch {}
+    // If localStorage failed, we'll try IDB in async init
+}
+
+// Try to recover from IndexedDB if localStorage is empty
+async function tryRecoverFromIDB() {
+    if (Object.keys(state.drawnCards).length > 0) return; // already have data
+    try {
+        const data = await loadFromIDB();
+        if (data) {
+            const parsed = JSON.parse(data);
+            if (parsed.drawnCards && Object.keys(parsed.drawnCards).length > 0) {
+                state = { ...getDefaultState(), ...parsed };
+                // Re-save to localStorage
+                try { localStorage.setItem(STORAGE_KEY, data); } catch {}
+            }
+        }
+    } catch {}
+}
+
+// ─── IndexedDB helpers ────────────────────────────────
+function saveToIDB(data) {
+    try {
+        const req = indexedDB.open(IDB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(IDB_STORE)) {
+                db.createObjectStore(IDB_STORE);
+            }
+        };
+        req.onsuccess = (e) => {
+            const db = e.target.result;
+            const tx = db.transaction(IDB_STORE, 'readwrite');
+            tx.objectStore(IDB_STORE).put(data, 'current');
+        };
+    } catch {}
+}
+
+function loadFromIDB() {
+    return new Promise((resolve) => {
+        try {
+            const req = indexedDB.open(IDB_NAME, 1);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(IDB_STORE)) {
+                    db.createObjectStore(IDB_STORE);
+                }
+            };
+            req.onsuccess = (e) => {
+                const db = e.target.result;
+                const tx = db.transaction(IDB_STORE, 'readonly');
+                const get = tx.objectStore(IDB_STORE).get('current');
+                get.onsuccess = () => resolve(get.result || null);
+                get.onerror = () => resolve(null);
+            };
+            req.onerror = () => resolve(null);
+        } catch { resolve(null); }
+    });
+}
+
+// ─── Save indicator ──────────────────────────────────
+let saveTimeout;
+function showSaveIndicator() {
+    const el = document.getElementById('save-indicator');
+    if (!el) return;
+    el.classList.add('show');
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => el.classList.remove('show'), 1500);
 }
 
 // ─── Utility ──────────────────────────────────────────
@@ -276,6 +354,10 @@ function $(sel) { return document.querySelector(sel); }
 function $$(sel) { return document.querySelectorAll(sel); }
 function today() { return new Date().toISOString().split('T')[0]; }
 function vibrate(ms = 10) { if (navigator.vibrate) navigator.vibrate(ms); }
+
+function getAvailableCount() {
+    return getDrawnCards().filter(c => !state.drawnCards[c.id].used).length;
+}
 
 function getDayNumber() {
     if (!state.firstUseDate) return 1;
@@ -638,9 +720,9 @@ function initOnboarding() {
 // ─── Home Screen ──────────────────────────────────────
 function updateHomeUI() {
     const remaining = getRemainingCards();
-    const drawn = getDrawnCards();
+    const available = getAvailableCount();
     $('#remaining-count').textContent = remaining.length;
-    $('#collection-count').textContent = drawn.length;
+    $('#collection-count').textContent = available;
 
     // Time-based greeting
     const hour = new Date().getHours();
@@ -655,7 +737,7 @@ function updateHomeUI() {
     const hint = $('#deck-hint');
     if (remaining.length === 0) {
         hint.textContent = 'Toutes les cartes ont été tirées !';
-    } else if (state.lastDrawDate === today()) {
+    } else if (!TEST_MODE && state.lastDrawDate === today()) {
         hint.textContent = 'Reviens demain pour une nouvelle carte';
     } else {
         hint.textContent = 'Touche le paquet';
@@ -667,8 +749,8 @@ function initHome() {
     $('#deck').addEventListener('click', () => {
         if ($('#deck').classList.contains('drawing')) return;
 
-        // Check if already drawn today
-        if (state.lastDrawDate === today()) {
+        // Check if already drawn today (skip in test mode)
+        if (!TEST_MODE && state.lastDrawDate === today()) {
             $('#already-drawn').classList.remove('is-hidden');
             vibrate(10);
             return;
@@ -826,8 +908,12 @@ function renderInventory() {
     const drawn = getDrawnCards();
     const grid = $('#inv-grid');
     const empty = $('#inv-empty');
+    const usedCount = drawn.filter(c => state.drawnCards[c.id].used).length;
 
     $('#inv-count').textContent = drawn.length;
+    // Update the home badge too (in case cards were used)
+    const badge = document.getElementById('collection-count');
+    if (badge) badge.textContent = drawn.length - usedCount;
 
     // Filter
     let filtered = drawn;
@@ -947,8 +1033,9 @@ function initModal() {
 let bgParticles;
 let revealParticles;
 
-function init() {
+async function init() {
     loadState();
+    await tryRecoverFromIDB();
 
     // Init particle systems
     bgParticles = new ParticleSystem($('#particles'));
@@ -973,6 +1060,21 @@ function init() {
     // Register service worker
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+
+    // Aggressive save on visibility change & before unload
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') saveState();
+    });
+    window.addEventListener('beforeunload', () => saveState());
+    window.addEventListener('pagehide', () => saveState());
+
+    // Test mode indicator
+    if (TEST_MODE) {
+        const badge = document.createElement('div');
+        badge.textContent = 'MODE TEST';
+        badge.style.cssText = 'position:fixed;top:8px;right:8px;z-index:999;font-size:10px;padding:4px 10px;border-radius:6px;background:rgba(255,107,107,0.2);color:#FF6B6B;font-weight:700;letter-spacing:0.1em;pointer-events:none;';
+        document.body.appendChild(badge);
     }
 }
 

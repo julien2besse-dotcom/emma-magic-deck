@@ -1050,6 +1050,27 @@ html, body {
     color: var(--text);
 }
 
+/* Colored filter buttons when active */
+.filter-supreme.active {
+    background: linear-gradient(135deg, rgba(255,107,107,0.15), rgba(107,203,119,0.15));
+    border-color: rgba(255,107,107,0.3);
+}
+.filter-legendary.active {
+    background: rgba(212,168,67,0.15);
+    border-color: rgba(212,168,67,0.35);
+    color: var(--gold-light);
+}
+.filter-rare.active {
+    background: rgba(155,109,215,0.15);
+    border-color: rgba(155,109,215,0.35);
+    color: var(--purple-light);
+}
+.filter-common.active {
+    background: rgba(139,148,165,0.12);
+    border-color: rgba(139,148,165,0.3);
+    color: var(--slate-light);
+}
+
 .filter:active { transform: scale(0.95); }
 
 .inv-grid {
@@ -1145,8 +1166,22 @@ html, body {
 }
 
 /* ─── Inventory card rarity styles ─── */
+
+/* SUPREME - Rainbow animated border */
 .inv-card.card-supreme {
     background: linear-gradient(155deg, #1a0a1e, #0a1a2e, #1a1a0a);
+    border: 2px solid transparent;
+    position: relative;
+}
+.inv-card.card-supreme::before {
+    content: '';
+    position: absolute;
+    top: -2px; left: -2px; right: -2px; bottom: -2px;
+    border-radius: calc(var(--card-r-sm) + 2px);
+    background: linear-gradient(135deg, var(--supreme-1), var(--supreme-2), var(--supreme-3), var(--supreme-4), var(--supreme-5), var(--supreme-1));
+    background-size: 300% 300%;
+    animation: rainbowBorder 4s linear infinite;
+    z-index: -1;
 }
 .inv-card.card-supreme .inv-rarity {
     background: linear-gradient(135deg, var(--supreme-1), var(--supreme-2));
@@ -1158,20 +1193,30 @@ html, body {
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
+.inv-card.card-supreme .inv-emoji {
+    filter: drop-shadow(0 0 8px rgba(255,107,107,0.4));
+}
 
+/* LEGENDARY - Gold glow + animated border */
 .inv-card.card-legendary {
     background: linear-gradient(155deg, #1a1608, #1e1a0a, #181408);
-    border: 1.5px solid rgba(212, 168, 67, 0.3);
+    border: 2px solid rgba(212, 168, 67, 0.5);
+    box-shadow: 0 0 20px rgba(212, 168, 67, 0.15), inset 0 0 20px rgba(212, 168, 67, 0.05);
 }
 .inv-card.card-legendary .inv-rarity {
     background: linear-gradient(135deg, var(--gold-dark), var(--gold));
     color: #0B0B1A;
 }
 .inv-card.card-legendary .inv-name { color: var(--gold-light); }
+.inv-card.card-legendary .inv-emoji {
+    filter: drop-shadow(0 0 6px rgba(212, 168, 67, 0.3));
+}
 
+/* RARE - Purple glow */
 .inv-card.card-rare {
     background: linear-gradient(155deg, #140a20, #1a0e2e, #12081e);
-    border: 1.5px solid rgba(155, 109, 215, 0.3);
+    border: 2px solid rgba(155, 109, 215, 0.45);
+    box-shadow: 0 0 15px rgba(155, 109, 215, 0.12);
 }
 .inv-card.card-rare .inv-rarity {
     background: linear-gradient(135deg, var(--purple-dark), var(--purple));
@@ -1179,13 +1224,15 @@ html, body {
 }
 .inv-card.card-rare .inv-name { color: var(--purple-light); }
 
+/* COMMON - Subtle slate, clearly different from rare */
 .inv-card.card-common {
     background: linear-gradient(155deg, #111318, #161820, #0f1115);
-    border: 1.5px solid rgba(139, 148, 165, 0.2);
+    border: 1px solid rgba(139, 148, 165, 0.15);
 }
 .inv-card.card-common .inv-rarity {
-    background: rgba(139, 148, 165, 0.2);
-    color: var(--slate-light);
+    background: rgba(139, 148, 165, 0.15);
+    color: var(--slate);
+    border: 1px solid rgba(139, 148, 165, 0.1);
 }
 .inv-card.card-common .inv-name { color: var(--slate-light); }
 
@@ -1463,6 +1510,28 @@ html, body {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+/* ─── Save indicator ────────────────────────────────── */
+.save-indicator {
+    position: fixed;
+    bottom: calc(90px + var(--sab));
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    font-size: 12px;
+    color: rgba(107, 203, 119, 0.8);
+    background: rgba(107, 203, 119, 0.1);
+    border: 1px solid rgba(107, 203, 119, 0.2);
+    padding: 6px 16px;
+    border-radius: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 30;
+}
+.save-indicator.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
 
 /* ─── Selection ─────────────────────────────────────── */
 ::selection {

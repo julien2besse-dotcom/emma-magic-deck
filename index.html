@@ -134,6 +134,7 @@
             <span class="btn-inv-text">Ma Collection</span>
             <span class="btn-inv-badge" id="collection-count">0</span>
         </button>
+        <div class="save-indicator" id="save-indicator">✓ Sauvegardé</div>
     </div>
 
     <!-- ═══════════════════════════════════════ -->
@@ -184,10 +185,10 @@
 
         <div class="inv-filters">
             <button class="filter active" data-filter="all">Toutes</button>
-            <button class="filter" data-filter="supreme">🌈</button>
-            <button class="filter" data-filter="legendary">🌟</button>
-            <button class="filter" data-filter="rare">✨</button>
-            <button class="filter" data-filter="common">⚪</button>
+            <button class="filter filter-supreme" data-filter="supreme">🌈 Suprême</button>
+            <button class="filter filter-legendary" data-filter="legendary">🌟 Légendaire</button>
+            <button class="filter filter-rare" data-filter="rare">✨ Rare</button>
+            <button class="filter filter-common" data-filter="common">⚪ Commune</button>
         </div>
 
         <div class="inv-grid" id="inv-grid"></div>
