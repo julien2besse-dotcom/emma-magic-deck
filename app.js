@@ -189,8 +189,8 @@ const CARDS = [
         name: 'Joker "Tu as Raison"',
         desc: 'Fin du débat. Tu gagnes immédiatement.',
         emoji: '✅',
-        rarity: 'common',
-        rarityLabel: 'Commune'
+        rarity: 'legendary',
+        rarityLabel: 'Légendaire'
     },
     {
         id: 'calin-batterie',
