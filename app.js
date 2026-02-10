@@ -273,7 +273,7 @@ let state = getDefaultState();
 function saveState() {
     const data = JSON.stringify(state);
     // Primary: localStorage
-    try { localStorage.setItem(STORAGE_KEY, data); } catch {}
+    try { localStorage.setItem(STORAGE_KEY, data); } catch { }
     // Backup: IndexedDB
     saveToIDB(data);
     // Show save indicator briefly
@@ -287,7 +287,7 @@ function loadState() {
             state = { ...getDefaultState(), ...JSON.parse(raw) };
             return;
         }
-    } catch {}
+    } catch { }
     // If localStorage failed, we'll try IDB in async init
 }
 
@@ -301,10 +301,10 @@ async function tryRecoverFromIDB() {
             if (parsed.drawnCards && Object.keys(parsed.drawnCards).length > 0) {
                 state = { ...getDefaultState(), ...parsed };
                 // Re-save to localStorage
-                try { localStorage.setItem(STORAGE_KEY, data); } catch {}
+                try { localStorage.setItem(STORAGE_KEY, data); } catch { }
             }
         }
-    } catch {}
+    } catch { }
 }
 
 // ─── IndexedDB helpers ────────────────────────────────
@@ -322,7 +322,7 @@ function saveToIDB(data) {
             const tx = db.transaction(IDB_STORE, 'readwrite');
             tx.objectStore(IDB_STORE).put(data, 'current');
         };
-    } catch {}
+    } catch { }
 }
 
 function loadFromIDB() {
@@ -360,7 +360,13 @@ function showSaveIndicator() {
 // ─── Utility ──────────────────────────────────────────
 function $(sel) { return document.querySelector(sel); }
 function $$(sel) { return document.querySelectorAll(sel); }
-function today() { return new Date().toISOString().split('T')[0]; }
+function today() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
 function vibrate(ms = 10) { if (navigator.vibrate) navigator.vibrate(ms); }
 
 function getAvailableCount() {
@@ -1086,7 +1092,7 @@ async function init() {
 
     // Register service worker
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(() => {});
+        navigator.serviceWorker.register('sw.js').catch(() => { });
     }
 
     // Aggressive save on visibility change & before unload
