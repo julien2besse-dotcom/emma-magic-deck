@@ -375,70 +375,47 @@ function getDrawnCards() {
     return CARDS.filter(c => !!state.drawnCards[c.id]);
 }
 
-// ─── Rigged Algorithm ─────────────────────────────────
+// ─── Fixed Draw Order (no randomness) ────────────────
+// Perfect sequence: nice mix of rarities throughout
+const DRAW_ORDER = [
+    'calin-ours',        //  1  commune   — auto-drawn onboarding
+    'tu-as-raison-1',    //  2  LÉGENDAIRE — forced second draw
+    'calin-matin',       //  3  commune
+    'massage-rapide-1',  //  4  commune
+    'cine-popcorn-1',    //  5  rare ✨
+    'vaisselle-1',       //  6  commune
+    'calin-batterie',    //  7  commune
+    'soiree-sushi',      //  8  LÉGENDAIRE 🌟 (~1 semaine)
+    'bain-simple-1',     //  9  commune
+    'session-bisous',    // 10  commune
+    'massage-detente',   // 11  rare ✨
+    'calin-lit',         // 12  commune
+    'chef-domicile-1',   // 13  rare ✨
+    'vaisselle-2',       // 14  commune
+    'joker-veto-social', // 15  LÉGENDAIRE 🌟 (~2 semaines)
+    'massage-rapide-2',  // 16  commune
+    'bain-reine-1',      // 17  rare ✨
+    'calin-reconfort',   // 18  commune
+    'cine-popcorn-2',    // 19  rare ✨
+    'chef-simple',       // 20  commune
+    'restau-grand-jeu',  // 21  LÉGENDAIRE 🌟 (~3 semaines)
+    'massage-rapide-3',  // 22  commune
+    'bain-reine-2',      // 23  rare ✨
+    'vaisselle-3',       // 24  commune
+    'tu-as-raison-2',    // 25  LÉGENDAIRE 🌟
+    'bain-simple-2',     // 26  commune
+    'chef-domicile-2',   // 27  rare ✨
+    'joker-supreme',     // 28  SUPRÊME 🌈 — the big one!
+    'massage-royal',     // 29  rare ✨ — belle fin
+];
+
 function selectCard() {
-    const remaining = getRemainingCards();
-    if (remaining.length === 0) return null;
-
-    // Force "Tu as Raison" as the second card (after onboarding auto-draw)
-    const totalDrawn = Object.keys(state.drawnCards).length;
-    if (totalDrawn === 1) {
-        const forced = remaining.find(c => c.id === 'tu-as-raison-1');
-        if (forced) return forced;
+    for (const id of DRAW_ORDER) {
+        if (!state.drawnCards[id]) {
+            return CARDS.find(c => c.id === id);
+        }
     }
-
-    const now = new Date();
-    const dayNum = getDayNumber();
-    const dayOfWeek = now.getDay(); // 0=Sun, 5=Fri, 6=Sat
-    const month = now.getMonth() + 1;
-    const date = now.getDate();
-
-    // March 7-9: Force calm cards
-    if (month === 3 && date >= 7 && date <= 9) {
-        const calmIds = ['calin-batterie', 'joker-veto-social', 'calin-reconfort', 'calin-ours'];
-        const calm = remaining.filter(c => calmIds.includes(c.id));
-        if (calm.length > 0) return pickRandom(calm);
-    }
-
-    // Days 1-3: Only common cards
-    if (dayNum <= 3) {
-        const commons = remaining.filter(c => c.rarity === 'common');
-        if (commons.length > 0) return pickRandom(commons);
-    }
-
-    // Weekend (Fri/Sat): Boost legendary
-    if (dayOfWeek === 5 || dayOfWeek === 6) {
-        const weights = remaining.map(c => {
-            if (c.rarity === 'supreme') return 15;
-            if (c.rarity === 'legendary') return 12;
-            if (c.rarity === 'rare') return 4;
-            return 1;
-        });
-        return weightedRandom(remaining, weights);
-    }
-
-    // Normal day: Slightly weighted toward common/rare
-    const weights = remaining.map(c => {
-        if (c.rarity === 'supreme') return 2;
-        if (c.rarity === 'legendary') return 3;
-        if (c.rarity === 'rare') return 6;
-        return 10;
-    });
-    return weightedRandom(remaining, weights);
-}
-
-function pickRandom(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function weightedRandom(items, weights) {
-    const total = weights.reduce((a, b) => a + b, 0);
-    let r = Math.random() * total;
-    for (let i = 0; i < items.length; i++) {
-        r -= weights[i];
-        if (r <= 0) return items[i];
-    }
-    return items[items.length - 1];
+    return null;
 }
 
 // ─── Particle System (Background) ─────────────────────
