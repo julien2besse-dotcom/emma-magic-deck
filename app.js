@@ -526,6 +526,13 @@ function showScreen(id, direction = 'fade') {
     const next = document.getElementById(id);
     const prev = currentScreen ? document.getElementById(currentScreen) : null;
 
+    // On first call, hide ALL other screens
+    if (!prev) {
+        document.querySelectorAll('.screen').forEach(s => {
+            if (s.id !== id) s.classList.add('is-hidden');
+        });
+    }
+
     if (prev && prev !== next) {
         if (direction === 'left') {
             prev.classList.add('slide-out-left');
@@ -534,15 +541,15 @@ function showScreen(id, direction = 'fade') {
             prev.classList.add('slide-out-right');
             prev.classList.remove('slide-in-right', 'slide-in-left');
         } else {
-            prev.classList.add('hidden');
+            prev.classList.add('is-hidden');
         }
         setTimeout(() => {
-            prev.classList.add('hidden');
+            prev.classList.add('is-hidden');
             prev.classList.remove('slide-out-left', 'slide-out-right', 'slide-in-right', 'slide-in-left');
         }, 500);
     }
 
-    next.classList.remove('hidden');
+    next.classList.remove('is-hidden');
     if (direction === 'left') {
         next.classList.add('slide-in-right');
     } else if (direction === 'right') {
@@ -662,7 +669,7 @@ function initHome() {
 
         // Check if already drawn today
         if (state.lastDrawDate === today()) {
-            $('#already-drawn').classList.remove('hidden');
+            $('#already-drawn').classList.remove('is-hidden');
             vibrate(10);
             return;
         }
@@ -670,7 +677,7 @@ function initHome() {
         // Check if no cards left
         const remaining = getRemainingCards();
         if (remaining.length === 0) {
-            $('#all-drawn').classList.remove('hidden');
+            $('#all-drawn').classList.remove('is-hidden');
             vibrate(10);
             return;
         }
@@ -689,12 +696,12 @@ function initHome() {
 
     // Already drawn overlay
     $('#btn-ok-drawn').addEventListener('click', () => {
-        $('#already-drawn').classList.add('hidden');
+        $('#already-drawn').classList.add('is-hidden');
     });
 
     // All drawn overlay
     $('#btn-ok-all').addEventListener('click', () => {
-        $('#all-drawn').classList.add('hidden');
+        $('#all-drawn').classList.add('is-hidden');
         showScreen('inventory', 'left');
         renderInventory();
     });
@@ -725,29 +732,43 @@ function drawCard() {
     deck.classList.add('drawing');
 
     // Show reveal screen
+    const inner = $('#card-inner');
+    const btn = $('#btn-collect');
+
+    const flipContainer = $('#card-flip');
+
+    // Reset state before showing
+    inner.classList.remove('flipped');
+    flipContainer.classList.remove('float-in');
+    btn.classList.remove('visible');
+    btn.classList.add('is-hidden');
+
     setTimeout(() => {
         showScreen('reveal', 'fade');
-        const inner = $('#card-inner');
-        inner.classList.remove('flipped');
-        inner.classList.add('float-in');
 
-        // Flip card after delay
-        setTimeout(() => {
-            inner.classList.add('flipped');
-            vibrate(20);
+        // Small delay to ensure the screen is visible before animating
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                flipContainer.classList.add('float-in');
 
-            // Trigger particles and effects
-            setTimeout(() => {
-                triggerRevealEffects(card.rarity);
-
-                // Show collect button
+                // Flip card after float-in completes
                 setTimeout(() => {
-                    const btn = $('#btn-collect');
-                    btn.classList.remove('hidden');
-                    btn.classList.add('visible');
-                }, 400);
-            }, 300);
-        }, 800);
+                    inner.classList.add('flipped');
+                    vibrate(20);
+
+                    // Trigger particles and effects
+                    setTimeout(() => {
+                        triggerRevealEffects(card.rarity);
+
+                        // Show collect button
+                        setTimeout(() => {
+                            btn.classList.remove('is-hidden');
+                            btn.classList.add('visible');
+                        }, 400);
+                    }, 400);
+                }, 700);
+            });
+        });
     }, 300);
 }
 
@@ -783,10 +804,11 @@ function initReveal() {
         vibrate(10);
         const btn = $('#btn-collect');
         btn.classList.remove('visible');
-        btn.classList.add('hidden');
+        btn.classList.add('is-hidden');
 
         const inner = $('#card-inner');
-        inner.classList.remove('flipped', 'float-in');
+        inner.classList.remove('flipped');
+        $('#card-flip').classList.remove('float-in');
 
         const deck = $('#deck');
         deck.classList.remove('drawing');
@@ -815,11 +837,11 @@ function renderInventory() {
 
     if (filtered.length === 0) {
         grid.innerHTML = '';
-        empty.classList.remove('hidden');
+        empty.classList.remove('is-hidden');
         return;
     }
 
-    empty.classList.add('hidden');
+    empty.classList.add('is-hidden');
     grid.innerHTML = '';
 
     filtered.forEach((card, i) => {
@@ -876,18 +898,18 @@ function openCardModal(card) {
     $('#modal-desc').textContent = card.desc;
 
     if (isUsed) {
-        $('#modal-actions').classList.add('hidden');
-        $('#modal-used').classList.remove('hidden');
+        $('#modal-actions').classList.add('is-hidden');
+        $('#modal-used').classList.remove('is-hidden');
     } else {
-        $('#modal-actions').classList.remove('hidden');
-        $('#modal-used').classList.add('hidden');
+        $('#modal-actions').classList.remove('is-hidden');
+        $('#modal-used').classList.add('is-hidden');
     }
 
-    modal.classList.remove('hidden');
+    modal.classList.remove('is-hidden');
 }
 
 function closeCardModal() {
-    $('#card-modal').classList.add('hidden');
+    $('#card-modal').classList.add('is-hidden');
     currentModalCard = null;
 }
 
@@ -901,7 +923,7 @@ function initModal() {
         if (!currentModalCard) return;
         vibrate(10);
         $('#confirm-card-name').textContent = currentModalCard.name;
-        $('#confirm-dialog').classList.remove('hidden');
+        $('#confirm-dialog').classList.remove('is-hidden');
     });
 
     // Confirm use
@@ -910,14 +932,14 @@ function initModal() {
         vibrate(20);
         state.drawnCards[currentModalCard.id].used = true;
         saveState();
-        $('#confirm-dialog').classList.add('hidden');
+        $('#confirm-dialog').classList.add('is-hidden');
         closeCardModal();
         renderInventory();
     });
 
     // Cancel use
     $('#btn-confirm-no').addEventListener('click', () => {
-        $('#confirm-dialog').classList.add('hidden');
+        $('#confirm-dialog').classList.add('is-hidden');
     });
 }
 

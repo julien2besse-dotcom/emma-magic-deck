@@ -2,7 +2,7 @@
     "name": "Emma's Magic Deck",
     "short_name": "Magic Deck",
     "description": "29 cartes magiques. 29 preuves d'amour.",
-    "start_url": "/",
+    "start_url": "./",
     "display": "standalone",
     "background_color": "#0B0B1A",
     "theme_color": "#0B0B1A",

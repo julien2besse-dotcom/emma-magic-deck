@@ -1,21 +1,7 @@
-const CACHE_NAME = 'emma-deck-v1';
-const ASSETS = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/app.js',
-    '/manifest.json',
-    '/icon.svg'
-];
+const CACHE_NAME = 'emma-deck-v2';
 
-// Install: cache assets
-self.addEventListener('install', (e) => {
-    e.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(ASSETS))
-            .then(() => self.skipWaiting())
-    );
-});
+// Install: skip caching static list (network-first is more reliable for deploys)
+self.addEventListener('install', () => self.skipWaiting());
 
 // Activate: clean old caches
 self.addEventListener('activate', (e) => {
@@ -26,27 +12,19 @@ self.addEventListener('activate', (e) => {
     );
 });
 
-// Fetch: cache-first, network fallback
+// Fetch: network-first, cache fallback
 self.addEventListener('fetch', (e) => {
-    // Skip non-GET and cross-origin
     if (e.request.method !== 'GET') return;
 
     e.respondWith(
-        caches.match(e.request).then(cached => {
-            if (cached) return cached;
-            return fetch(e.request).then(response => {
-                // Cache successful responses
-                if (response.ok) {
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
-                }
-                return response;
-            });
-        }).catch(() => {
-            // Fallback to index for navigation
-            if (e.request.mode === 'navigate') {
-                return caches.match('/index.html');
+        fetch(e.request).then(response => {
+            if (response.ok) {
+                const clone = response.clone();
+                caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
             }
+            return response;
+        }).catch(() => {
+            return caches.match(e.request);
         })
     );
 });

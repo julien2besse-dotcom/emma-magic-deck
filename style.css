@@ -121,12 +121,13 @@ html, body {
     justify-content: center;
     z-index: 1;
     padding: calc(20px + var(--sat)) 24px calc(20px + var(--sab));
-    transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+    transition: opacity 0.5s var(--ease), transform 0.5s var(--ease), visibility 0.5s;
 }
 
-.screen.hidden {
+.screen.is-hidden {
     opacity: 0;
     pointer-events: none;
+    visibility: hidden;
     transform: scale(0.96);
 }
 
@@ -934,18 +935,19 @@ html, body {
     transform: rotateY(180deg);
 }
 
-.card-inner.float-in {
+/* Use the container for the float-in so it doesn't conflict with flipped transform */
+.card-flip-container.float-in {
     animation: cardFloatIn 0.6s var(--ease-bounce) both;
 }
 
 @keyframes cardFloatIn {
     0% {
         opacity: 0;
-        transform: translateY(80px) scale(0.8) rotateX(10deg);
+        transform: translateY(80px) scale(0.8);
     }
     100% {
         opacity: 1;
-        transform: translateY(0) scale(1) rotateX(0);
+        transform: translateY(0) scale(1);
     }
 }
 
@@ -955,7 +957,7 @@ html, body {
     transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
 }
 
-.btn-collect.hidden {
+.btn-collect.is-hidden {
     opacity: 0;
     transform: translateY(20px);
     pointer-events: none;
@@ -1219,9 +1221,10 @@ html, body {
     transition: opacity 0.3s var(--ease);
 }
 
-.modal.hidden {
+.modal.is-hidden {
     opacity: 0;
     pointer-events: none;
+    visibility: hidden;
 }
 
 .modal-backdrop {
@@ -1302,9 +1305,10 @@ html, body {
     transition: opacity 0.4s var(--ease);
 }
 
-.overlay.hidden {
+.overlay.is-hidden {
     opacity: 0;
     pointer-events: none;
+    visibility: hidden;
 }
 
 .overlay-box {
@@ -1447,7 +1451,12 @@ html, body {
 }
 
 /* ─── Utility ───────────────────────────────────────── */
-.hidden { display: none !important; }
+/* Elements that truly need display:none (no transition needed) */
+.inv-empty.is-hidden,
+#modal-actions.is-hidden,
+#modal-used.is-hidden {
+    display: none;
+}
 .no-transition { transition: none !important; }
 
 /* ─── Scrollbar global ──────────────────────────────── */
