@@ -239,6 +239,14 @@ const CARDS = [
         emoji: '🌅',
         rarity: 'common',
         rarityLabel: 'Commune'
+    },
+    {
+        id: 'bon-voyage-perou',
+        name: 'Bon Voyage Mon Amour',
+        desc: 'Je t\'aime de tout mon cœur, d\'un amour profond. Profite du Pérou, tu me manques déjà. ♥',
+        emoji: '✈️',
+        rarity: 'legendary',
+        rarityLabel: 'Légendaire'
     }
 ];
 
@@ -406,7 +414,8 @@ const DRAW_ORDER = [
     'tu-as-raison-2',    // 26  LÉGENDAIRE 🌟                            (6 mars)
     'bain-simple-2',     // 27  commune                                   (7 mars)
     'chef-domicile-2',   // 28  rare ✨                                   (8 mars)
-    'massage-royal',     // 29  rare ✨ — dernière carte                  (9 mars)
+    'massage-royal',     // 29  rare ✨                                   (9 mars)
+    'bon-voyage-perou',  // 30  LÉGENDAIRE 🌟 — bon voyage mon amour !   (10 mars)
 ];
 
 function selectCard() {
