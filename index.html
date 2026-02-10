@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0B0B1A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Emma's Deck">
+    <title>✨ Emma's Magic Deck</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Particle Canvas Background -->
+    <canvas id="particles"></canvas>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- ONBOARDING (shown once)                -->
+    <!-- ═══════════════════════════════════════ -->
+    <div id="onboarding" class="screen">
+        <div class="onboarding-step active" data-step="0">
+            <div class="onboarding-content">
+                <div class="onboarding-hearts">
+                    <span class="floating-heart" style="--delay:0s;--x:-30px">♥</span>
+                    <span class="floating-heart" style="--delay:0.5s;--x:25px">♥</span>
+                    <span class="floating-heart" style="--delay:1s;--x:-15px">♥</span>
+                    <span class="floating-heart" style="--delay:1.5s;--x:35px">♥</span>
+                </div>
+                <h1 class="onboarding-title">Emma...</h1>
+                <p class="onboarding-subtitle">J'ai créé quelque chose pour toi</p>
+            </div>
+        </div>
+
+        <div class="onboarding-step" data-step="1">
+            <div class="onboarding-content">
+                <div class="preview-card-stack">
+                    <div class="preview-card pc-3"></div>
+                    <div class="preview-card pc-2"></div>
+                    <div class="preview-card pc-1">
+                        <span class="preview-card-symbol">✦</span>
+                    </div>
+                </div>
+                <h2 class="onboarding-title-sm">Des cartes magiques</h2>
+                <p class="onboarding-text">Des preuves d'amour cachées<br>dans un deck enchanté</p>
+            </div>
+        </div>
+
+        <div class="onboarding-step" data-step="2">
+            <div class="onboarding-content">
+                <div class="onboarding-flow">
+                    <div class="flow-step">
+                        <span class="flow-icon">☀️</span>
+                        <span class="flow-label">Chaque jour</span>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <span class="flow-icon">🃏</span>
+                        <span class="flow-label">Tire une carte</span>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <span class="flow-icon">💝</span>
+                        <span class="flow-label">Un cadeau</span>
+                    </div>
+                </div>
+                <h2 class="onboarding-title-sm">Un rituel quotidien</h2>
+                <p class="onboarding-text">Chaque carte est un cadeau,<br>un service, un moment pour toi</p>
+            </div>
+        </div>
+
+        <div class="onboarding-step" data-step="3">
+            <div class="onboarding-content">
+                <div class="onboarding-sparkle">✨</div>
+                <h2 class="onboarding-title-sm">Ta collection t'attend</h2>
+                <p class="onboarding-text">Collectionne tes cartes et utilise-les<br>quand tu veux. C'est toi qui
+                    décides.</p>
+                <button class="btn-magic" id="btn-start">
+                    <span class="btn-text">Découvrir mes cartes</span>
+                    <div class="btn-shimmer"></div>
+                </button>
+            </div>
+        </div>
+
+        <div class="onboarding-nav">
+            <div class="onboarding-dots">
+                <span class="dot active" data-dot="0"></span>
+                <span class="dot" data-dot="1"></span>
+                <span class="dot" data-dot="2"></span>
+                <span class="dot" data-dot="3"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- HOME SCREEN                            -->
+    <!-- ═══════════════════════════════════════ -->
+    <div id="home" class="screen hidden">
+        <div class="home-header">
+            <p class="home-greeting" id="home-greeting">Bonjour Emma ♥</p>
+            <h1 class="home-title">Deck Magique</h1>
+        </div>
+
+        <div class="deck-area">
+            <div class="deck-glow"></div>
+            <div class="deck" id="deck">
+                <div class="card-back cb-4"></div>
+                <div class="card-back cb-3"></div>
+                <div class="card-back cb-2"></div>
+                <div class="card-back cb-1">
+                    <div class="card-back-inner">
+                        <div class="card-back-pattern"></div>
+                        <div class="card-back-symbol">✦</div>
+                        <div class="card-back-shimmer"></div>
+                    </div>
+                </div>
+            </div>
+            <p class="deck-hint" id="deck-hint">Touche le paquet</p>
+            <p class="deck-remaining"><span id="remaining-count">29</span> cartes restantes</p>
+        </div>
+
+        <button class="btn-inventory" id="btn-inventory">
+            <span class="btn-inv-icon">📦</span>
+            <span class="btn-inv-text">Ma Collection</span>
+            <span class="btn-inv-badge" id="collection-count">0</span>
+        </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CARD REVEAL SCREEN                     -->
+    <!-- ═══════════════════════════════════════ -->
+    <div id="reveal" class="screen hidden">
+        <div class="reveal-rays" id="reveal-rays"></div>
+        <div class="reveal-container">
+            <div class="card-flip-container" id="card-flip">
+                <div class="card-inner" id="card-inner">
+                    <div class="card-front">
+                        <div class="card-back-inner">
+                            <div class="card-back-pattern"></div>
+                            <div class="card-back-symbol">✦</div>
+                        </div>
+                    </div>
+                    <div class="card-face" id="card-face">
+                        <div class="card-rarity-label" id="card-rarity-label"></div>
+                        <div class="card-emoji" id="card-emoji"></div>
+                        <h2 class="card-name" id="card-name"></h2>
+                        <p class="card-desc" id="card-desc"></p>
+                        <div class="card-border-glow"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="btn-magic btn-collect hidden" id="btn-collect">
+            <span class="btn-text">Ajouter à ma collection</span>
+            <div class="btn-shimmer"></div>
+        </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- INVENTORY SCREEN                       -->
+    <!-- ═══════════════════════════════════════ -->
+    <div id="inventory" class="screen hidden">
+        <div class="inv-header">
+            <button class="btn-back" id="btn-back">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5" />
+                    <path d="M12 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <h1 class="inv-title">Ma Collection</h1>
+            <div class="inv-counter"><span id="inv-count">0</span>/29</div>
+        </div>
+
+        <div class="inv-filters">
+            <button class="filter active" data-filter="all">Toutes</button>
+            <button class="filter" data-filter="supreme">🌈</button>
+            <button class="filter" data-filter="legendary">🌟</button>
+            <button class="filter" data-filter="rare">✨</button>
+            <button class="filter" data-filter="common">⚪</button>
+        </div>
+
+        <div class="inv-grid" id="inv-grid"></div>
+
+        <div class="inv-empty hidden" id="inv-empty">
+            <span class="inv-empty-icon">🃏</span>
+            <p>Pas encore de cartes !<br>Tire ta première carte</p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CARD DETAIL MODAL                      -->
+    <!-- ═══════════════════════════════════════ -->
+    <div id="card-modal" class="modal hidden">
+        <div class="modal-backdrop" id="modal-backdrop"></div>
+        <div class="modal-body">
+            <div class="modal-card" id="modal-card">
+                <div class="card-rarity-label" id="modal-rarity"></div>
+                <div class="card-emoji" id="modal-emoji"></div>
+                <h2 class="card-name" id="modal-name"></h2>
+                <p class="card-desc" id="modal-desc"></p>
+                <div class="card-border-glow"></div>
+            </div>
+            <div class="modal-actions" id="modal-actions">
+                <button class="btn-use" id="btn-use">Utiliser cette carte</button>
+                <button class="btn-close-modal" id="btn-close">Fermer</button>
+            </div>
+            <div class="modal-used hidden" id="modal-used">
+                <span class="used-badge-big">UTILISÉE</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CONFIRM USE DIALOG                     -->
+    <!-- ═══════════════════════════════════════ -->
+    <div id="confirm-dialog" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="confirm-box">
+            <p class="confirm-title">Utiliser cette carte ?</p>
+            <p class="confirm-card-name" id="confirm-card-name"></p>
+            <p class="confirm-note">Une carte utilisée ne peut plus être réutilisée</p>
+            <div class="confirm-btns">
+                <button class="btn-confirm-yes" id="btn-confirm-yes">Oui, j'utilise !</button>
+                <button class="btn-confirm-no" id="btn-confirm-no">Non, pas encore</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- ALREADY DRAWN OVERLAY                  -->
+    <!-- ═══════════════════════════════════════ -->
+    <div id="already-drawn" class="overlay hidden">
+        <div class="overlay-box">
+            <span class="overlay-icon">🌙</span>
+            <h2>Reviens demain</h2>
+            <p>Tu as déjà tiré ta carte aujourd'hui.<br>Une nouvelle surprise t'attend demain ♥</p>
+            <button class="btn-magic" id="btn-ok-drawn">
+                <span class="btn-text">D'accord</span>
+                <div class="btn-shimmer"></div>
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- ALL CARDS DRAWN OVERLAY                -->
+    <!-- ═══════════════════════════════════════ -->
+    <div id="all-drawn" class="overlay hidden">
+        <div class="overlay-box">
+            <span class="overlay-icon">🎉</span>
+            <h2>Deck complet !</h2>
+            <p>Tu as tiré toutes tes cartes.<br>Profite bien de ta collection 💫</p>
+            <button class="btn-magic" id="btn-ok-all">
+                <span class="btn-text">Voir ma collection</span>
+                <div class="btn-shimmer"></div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Canvas for reveal particles -->
+    <canvas id="reveal-particles"></canvas>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
