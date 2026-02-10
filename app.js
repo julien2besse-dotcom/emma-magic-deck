@@ -378,35 +378,35 @@ function getDrawnCards() {
 // ─── Fixed Draw Order (no randomness) ────────────────
 // Perfect sequence: nice mix of rarities throughout
 const DRAW_ORDER = [
-    'calin-ours',        //  1  commune   — auto-drawn onboarding
-    'tu-as-raison-1',    //  2  LÉGENDAIRE — forced second draw
-    'calin-matin',       //  3  commune
-    'massage-rapide-1',  //  4  commune
-    'cine-popcorn-1',    //  5  rare ✨
-    'vaisselle-1',       //  6  commune
-    'calin-batterie',    //  7  commune
-    'soiree-sushi',      //  8  LÉGENDAIRE 🌟 (~1 semaine)
-    'bain-simple-1',     //  9  commune
-    'session-bisous',    // 10  commune
-    'massage-detente',   // 11  rare ✨
-    'calin-lit',         // 12  commune
-    'chef-domicile-1',   // 13  rare ✨
-    'vaisselle-2',       // 14  commune
-    'joker-veto-social', // 15  LÉGENDAIRE 🌟 (~2 semaines)
-    'massage-rapide-2',  // 16  commune
-    'bain-reine-1',      // 17  rare ✨
-    'calin-reconfort',   // 18  commune
-    'cine-popcorn-2',    // 19  rare ✨
-    'chef-simple',       // 20  commune
-    'restau-grand-jeu',  // 21  LÉGENDAIRE 🌟 (~3 semaines)
-    'massage-rapide-3',  // 22  commune
-    'bain-reine-2',      // 23  rare ✨
-    'vaisselle-3',       // 24  commune
-    'tu-as-raison-2',    // 25  LÉGENDAIRE 🌟
-    'bain-simple-2',     // 26  commune
-    'chef-domicile-2',   // 27  rare ✨
-    'joker-supreme',     // 28  SUPRÊME 🌈 — the big one!
-    'massage-royal',     // 29  rare ✨ — belle fin
+    'calin-ours',        //  1  commune   — auto-drawn onboarding        (10 fév)
+    'tu-as-raison-1',    //  2  LÉGENDAIRE — forced second draw           (10 fév)
+    'calin-matin',       //  3  commune                                   (11 fév)
+    'massage-rapide-1',  //  4  commune                                   (12 fév)
+    'cine-popcorn-1',    //  5  rare ✨                                   (13 fév)
+    'vaisselle-1',       //  6  commune                                   (14 fév)
+    'calin-batterie',    //  7  commune                                   (15 fév)
+    'soiree-sushi',      //  8  LÉGENDAIRE 🌟 (~1 semaine)               (16 fév)
+    'bain-simple-1',     //  9  commune                                   (17 fév)
+    'session-bisous',    // 10  commune                                   (18 fév)
+    'massage-detente',   // 11  rare ✨                                   (19 fév)
+    'calin-lit',         // 12  commune                                   (20 fév)
+    'chef-domicile-1',   // 13  rare ✨                                   (21 fév)
+    'vaisselle-2',       // 14  commune                                   (22 fév)
+    'joker-veto-social', // 15  LÉGENDAIRE 🌟 (~2 semaines)              (23 fév)
+    'massage-rapide-2',  // 16  commune                                   (24 fév)
+    'bain-reine-1',      // 17  rare ✨                                   (25 fév)
+    'calin-reconfort',   // 18  commune                                   (26 fév)
+    'cine-popcorn-2',    // 19  rare ✨                                   (27 fév)
+    'joker-supreme',     // 20  SUPRÊME 🌈 — avant le Pérou !            (28 fév)
+    'chef-simple',       // 21  commune                                   (1 mars)
+    'restau-grand-jeu',  // 22  LÉGENDAIRE 🌟                            (2 mars)
+    'massage-rapide-3',  // 23  commune                                   (3 mars)
+    'bain-reine-2',      // 24  rare ✨                                   (4 mars)
+    'vaisselle-3',       // 25  commune                                   (5 mars)
+    'tu-as-raison-2',    // 26  LÉGENDAIRE 🌟                            (6 mars)
+    'bain-simple-2',     // 27  commune                                   (7 mars)
+    'chef-domicile-2',   // 28  rare ✨                                   (8 mars)
+    'massage-royal',     // 29  rare ✨ — dernière carte                  (9 mars)
 ];
 
 function selectCard() {
