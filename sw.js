@@ -1,4 +1,4 @@
-const CACHE_NAME = 'emma-deck-v2';
+const CACHE_NAME = 'emma-deck-v3';
 
 // Install: skip caching static list (network-first is more reliable for deploys)
 self.addEventListener('install', () => self.skipWaiting());

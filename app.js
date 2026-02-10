@@ -181,8 +181,8 @@ const CARDS = [
         name: 'Joker "Tu as Raison"',
         desc: 'Fin du débat. Tu gagnes immédiatement.',
         emoji: '✅',
-        rarity: 'common',
-        rarityLabel: 'Commune'
+        rarity: 'legendary',
+        rarityLabel: 'Légendaire'
     },
     {
         id: 'tu-as-raison-2',
@@ -379,6 +379,13 @@ function getDrawnCards() {
 function selectCard() {
     const remaining = getRemainingCards();
     if (remaining.length === 0) return null;
+
+    // Force "Tu as Raison" as the second card (after onboarding auto-draw)
+    const totalDrawn = Object.keys(state.drawnCards).length;
+    if (totalDrawn === 1) {
+        const forced = remaining.find(c => c.id === 'tu-as-raison-1');
+        if (forced) return forced;
+    }
 
     const now = new Date();
     const dayNum = getDayNumber();
@@ -705,15 +712,49 @@ function initOnboarding() {
         });
     });
 
-    // Start button
+    // Start button — auto-draw first card (calin-ours) during onboarding
     $('#btn-start').addEventListener('click', (e) => {
         e.stopPropagation();
         vibrate(15);
         state.onboarded = true;
         state.firstUseDate = today();
+
+        // Auto-draw calin-ours as first card, but DON'T set lastDrawDate
+        // so she can draw a second card the same day
+        const firstCard = CARDS.find(c => c.id === 'calin-ours');
+        currentRevealCard = firstCard;
+        state.drawnCards[firstCard.id] = { drawnDate: today(), used: false };
         saveState();
-        showScreen('home', 'fade');
-        updateHomeUI();
+
+        // Show the reveal animation
+        setupRevealCard(firstCard);
+        const inner = $('#card-inner');
+        const btn = $('#btn-collect');
+        const flipContainer = $('#card-flip');
+
+        inner.classList.remove('flipped');
+        flipContainer.classList.remove('float-in');
+        btn.classList.remove('visible');
+        btn.classList.add('is-hidden');
+
+        showScreen('reveal', 'fade');
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                flipContainer.classList.add('float-in');
+                setTimeout(() => {
+                    inner.classList.add('flipped');
+                    vibrate(20);
+                    setTimeout(() => {
+                        triggerRevealEffects(firstCard.rarity);
+                        setTimeout(() => {
+                            btn.classList.remove('is-hidden');
+                            btn.classList.add('visible');
+                        }, 400);
+                    }, 400);
+                }, 700);
+            });
+        });
     });
 }
 
